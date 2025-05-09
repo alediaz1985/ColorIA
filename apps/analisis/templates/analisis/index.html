@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inicio - Color.IA{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'analisis/css/analisis.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'analisis/js/analisis.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<h2 class="titulo">🎨 ¿Cómo querés cargar tu imagen?</h2>
+
+{% if error %}
+    <div class="alert-error">{{ error }}</div>
+{% endif %}
+
+<div class="selector-opciones">
+    <label>
+        <input type="radio" name="tipo_entrada" value="archivo" checked onchange="cambiarFormulario()">
+        📁 Subir desde archivo
+    </label>
+    <label>
+        <input type="radio" name="tipo_entrada" value="camara" onchange="cambiarFormulario()">
+        📷 Capturar con cámara
+    </label>
+</div>
+
+<!-- Formulario para archivo -->
+<div id="form-archivo" class="formulario">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="origen" value="archivo">
+        {{ form.as_p }}
+        <button type="submit" class="boton-analizar">📁 Analizar imagen</button>
+    </form>
+</div>
+
+<!-- Formulario para cámara -->
+<div id="form-camara" class="formulario" style="display: none;">
+    <video id="video" width="320" height="240" autoplay></video>
+    <canvas id="canvas" width="320" height="240" style="display: none;"></canvas>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="origen" value="camara">
+        <input type="hidden" name="imagen_web" id="imagen_web">
+        <button type="button" onclick="capturarImagen('video', 'canvas', 'imagen_web')" class="boton-analizar">📸 Capturar</button>
+        <button type="submit" class="boton-analizar">Analizar captura</button>
+    </form>
+</div>
+
+{% if color %}
+    <h3 class="resultado">🧠 Color predominante: <strong>{{ color }}</strong></h3>
+    <div class="color-box" style="background-color: {{ color }};"></div>
+{% endif %}
+{% endblock %}
